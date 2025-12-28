@@ -5,10 +5,10 @@ import joblib
 import numpy as np
 import pandas as pd
 
-app = Flask(__name__, static_folder='')
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+app = Flask(__name__, static_folder=os.path.join(BASE_DIR, "static"), static_url_path="/static")
+MODEL_PATH = os.path.join(BASE_DIR, "Models", "random_forest_cache.pkl")
 
-# Path to your trained ML model
-MODEL_PATH = os.path.join('Models', 'random_forest_cache.pkl')
 model = None
 
 # --- Load ML Model ---
@@ -82,5 +82,6 @@ def predict_evict():
 
 
 # --- Run Flask Server ---
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+
+# update for vercel deploy
+
