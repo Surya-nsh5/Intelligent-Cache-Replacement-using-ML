@@ -45,8 +45,8 @@ def predict_evict():
         pages = data.get("pages", [])
         page_ids = data.get("pageIds", [])
 
-        if not model:
-            return jsonify({"error": "ML model not loaded"}), 500
+        model = get_model()
+
 
         X = [[
             p.get("last_access_time", 0),
@@ -67,4 +67,5 @@ def predict_evict():
     except Exception as e:
         traceback.print_exc()
         return jsonify({"error": str(e)}), 400
+
 
