@@ -12,15 +12,15 @@ app = Flask(__name__)
 MODEL_PATH = os.path.join(BASE_DIR, "Models", "random_forest_cache.pkl")
 model = None
 
-try:
-    if os.path.exists(MODEL_PATH):
-        model = joblib.load(MODEL_PATH)
-        print("ML model loaded")
-    else:
-        print("Model not found:", MODEL_PATH)
-except Exception as e:
-    print("Model load error:", e)
-    model = None
+def get_model():
+    global model
+    if model is None:
+        if os.path.exists(MODEL_PATH):
+            model = joblib.load(MODEL_PATH)
+        else:
+            raise Exception("Model file missing")
+    return model
+
 
 
 @app.route("/")
@@ -67,3 +67,4 @@ def predict_evict():
     except Exception as e:
         traceback.print_exc()
         return jsonify({"error": str(e)}), 400
+
