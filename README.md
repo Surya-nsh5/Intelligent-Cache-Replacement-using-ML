@@ -1,40 +1,87 @@
-# 🧠 Intelligent Cache Replacement using Machine Learning
+<div align="center">
+  <h1>🧠 Intelligent Cache Replacement using Machine Learning</h1>
+  <p>A real-time cache replacement engine utilizing live Machine Learning predictions alongside traditional heuristics (LRU, MRU) to dynamically optimize hit rates and memory management.</p>
+  
+  <img src="https://img.shields.io/badge/Python-3.x-blue.svg?logo=python&logoColor=white" alt="Python" />
+  <img src="https://img.shields.io/badge/Flask-Backend-black.svg?logo=flask" alt="Flask" />
+  <img src="https://img.shields.io/badge/TailwindCSS-Frontend-06B6D4.svg?logo=tailwindcss&logoColor=white" alt="Tailwind CSS" />
+  <img src="https://img.shields.io/badge/scikit--learn-ML_Models-F7931E.svg?logo=scikit-learn&logoColor=white" alt="Scikit-Learn" />
+</div>
 
-This project implements an **Intelligent Cache Replacement System** using **Machine Learning** to optimize cache performance. The system predicts which cache item should be replaced based on access patterns, improving hit ratios and reducing latency.  
-
-Two machine learning models are implemented: **Naive Bayes** and **Random Forest**.
-
----
+<br />
 
 ## 📌 Overview
 
-Caches improve system performance by storing frequently accessed data. Traditional cache replacement policies like LRU or FIFO do not always account for complex access patterns.  
+Caches significantly improve system performance by storing frequently accessed data, but traditional cache replacement policies like **LRU** (Least Recently Used) or **FIFO** (First-In-First-Out) rely on rigid heuristics that don't adapt to complex, non-linear access patterns.
 
-This project uses machine learning to analyze cache access behavior and predict the best candidate for replacement. It simulates cache operations and continuously learns from historical access patterns.
+This project introduces a **live, data-driven approach**. It uses trained Machine Learning models (Random Forest, Naive Bayes, Decision Tree) deployed via a Flask backend to actively analyze current cache access behavior and intelligently predict the optimal candidate for eviction in real-time.
 
----
+## ✨ Key Features
 
-## 🧩 Dataset
-
-The dataset contains the following **features**:
-
-| Feature Name       | Description |
-|--------------------|-------------|
-| `last_access_time` | Timestamp of last access |
-| `access_count`     | Number of times the item has been accessed |
-| `recency_rank`     | Rank based on recency of access |
-| `access_type`      | Type of access (read/write) |
-| `cache_item`       | Unique identifier for the cache item |
-| `label`            | Target label indicating whether the item is replaced or retained |
-| `other_features`   | Additional computed metrics (optional) |
-
-> The `label` column is used to train the model to predict replacement decisions.
+* **🧠 Live ML Predictions:** The backend scores individual cache items based on 5 unique statistical features to make live eviction choices.
+* **⚡ Modern Dashboard:** A completely overhauled, fully responsive, zero-build-step frontend built with Tailwind CSS.
+* **🎛️ Dynamic Resizing:** Adjust your cache size on the fly (from 2 up to 32 slots) and watch the UI and ML engine adapt seamlessly.
+* **📊 Real-time Analytics:** Watch cache hits, misses, and hit-rates update live with CSS micro-animations.
+* **💻 Live Activity Log:** A terminal-like scrolling activity log capturing every hit, miss, and system eviction decision.
 
 ---
 
-## 🧰 Requirements
+## 🏗️ Architecture
 
-Install the required Python libraries before running the project:
+* **Backend:** Python / Flask
+* **Machine Learning:** `scikit-learn`, `pandas`, `numpy`, `joblib`
+* **Frontend:** Vanilla HTML5, JavaScript, and Tailwind CSS (via CDN)
+
+---
+
+## 🧩 Dataset & Model Features
+
+The models are trained to predict the probability that a specific item should be evicted based on the following real-time computed features:
+
+| Feature Name | Description |
+| :--- | :--- |
+| `last_access_time` | Time elapsed since the item was last accessed |
+| `access_count` | Absolute frequency (number of times the item has been accessed) |
+| `recency_rank` | The item's relative position when sorted by most recent usage |
+| `access_type` | Encoded type of access (e.g., read vs write) |
+| `cache_item` | Hashed/Encoded unique identifier for the specific cache item |
+
+---
+
+## 🚀 Getting Started
+
+### 1. Requirements
+
+Ensure you have Python 3.x installed. Install the required libraries:
 
 ```bash
 pip install pandas scikit-learn flask joblib numpy
+```
+
+*(Or simply run `pip install -r requirements.txt` if available)*
+
+### 2. Running the Live Engine
+
+Navigate into the application folder and start the Flask server:
+
+```bash
+cd IntelligenceCacheReplacement
+python app.py
+```
+
+Open your web browser and navigate to:
+**👉 `http://localhost:5000`**
+
+### 3. Training the Models (Optional)
+
+If you wish to retrain the models or experiment with the algorithms, ensure you have the `cache_dataset.csv` file available in the root directory. You can run the training scripts located in the `Training Model` folder:
+
+```bash
+# Example: Retraining the Random Forest model
+python "Training Model/random-forest.py"
+
+# Example: Retraining the Naive Bayes model
+python "Training Model/naive-bayes.py"
+```
+
+*Note: The newly trained `.pkl` models will be saved to the `Models/` directory, and `app.py` will automatically load them on its next restart.*

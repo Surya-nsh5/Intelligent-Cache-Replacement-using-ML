@@ -1,59 +1,348 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="font-size: 15.5px;">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ML Cache Replacement</title>
+    <!-- M Logo Favicon -->
+    <link rel="icon"
+        href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="%237c3aed"/><text x="50" y="72" font-family="system-ui, sans-serif" font-size="65" font-weight="bold" fill="white" text-anchor="middle">M</text></svg>'>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#1e293b',
+                            900: '#0f172a',
+                            950: '#020617',
+                        },
+                        violet: {
+                            500: '#8b5cf6',
+                            600: '#7c3aed',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <style>
+        /* Hide scrollbar for all elements */
+        ::-webkit-scrollbar {
+            display: none;
+        }
+        * {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+    </style>
     <link rel="stylesheet" href="CSS/cache.css">
 </head>
 
-<body>
+<body class="bg-slate-950 text-slate-100 antialiased min-h-screen">
 
-    <div class="container">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 lg:py-8">
+        <div class="flex flex-col gap-6 lg:gap-10">
+
+            <!-- Top Section: Informational -->
+            <div class="w-full space-y-6">
+                <!-- Header -->
+                <div class="space-y-4">
+                    <div
+                        class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-violet-900/40 border border-violet-800/50 text-violet-300 text-xs font-semibold tracking-wide uppercase">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z">
+                            </path>
+                        </svg>
+                        <span>Research Project</span>
+                    </div>
+                    <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white leading-tight">
+                        Intelligence Cache Replacement <span
+                            class="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-indigo-400">Using
+                            ML</span>
+                    </h1>
+                    <p class="text-slate-400 text-lg leading-relaxed">
+                        A real-time cache replacement engine utilizing live Machine Learning predictions alongside
+                        traditional heuristics (LRU, MRU) to dynamically optimize hit rates and memory management.
+                    </p>
+                </div>
+
+                <!-- Eviction Policies Explainer -->
+                <div class="space-y-4">
+                    <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider">How it Works</h3>
+                    <div class="space-y-3">
+                        <div class="bg-slate-900 p-3 sm:p-4 rounded-xl border border-slate-800 shadow-sm flex gap-3">
+                            <div class="flex-shrink-0 mt-0.5">
+                                <span
+                                    class="inline-flex items-center justify-center h-6 w-6 rounded-md bg-slate-800 text-slate-300 font-bold text-xs">L</span>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-semibold text-slate-100">LRU (Least Recently Used)</h4>
+                                <p class="text-xs text-slate-400 mt-1 leading-relaxed">Evicts the item that hasn't been
+                                    accessed for the longest time, assuming recent accesses imply future accesses.</p>
+                            </div>
+                        </div>
+                        <div class="bg-slate-900 p-3 sm:p-4 rounded-xl border border-slate-800 shadow-sm flex gap-3">
+                            <div class="flex-shrink-0 mt-0.5">
+                                <span
+                                    class="inline-flex items-center justify-center h-6 w-6 rounded-md bg-slate-800 text-slate-300 font-bold text-xs">M</span>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-semibold text-slate-100">MRU (Most Recently Used)</h4>
+                                <p class="text-xs text-slate-400 mt-1 leading-relaxed">Evicts the most recently accessed
+                                    item. Useful in specific non-repeating access patterns like sequential scanning.</p>
+                            </div>
+                        </div>
+                        <div
+                            class="bg-violet-900/20 p-3 sm:p-4 rounded-xl border border-violet-800/50 shadow-sm flex gap-3 relative overflow-hidden group">
+                            <div
+                                class="absolute inset-0 bg-gradient-to-r from-violet-500/0 via-violet-500/10 to-violet-500/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000">
+                            </div>
+                            <div class="flex-shrink-0 mt-0.5 relative z-10">
+                                <span
+                                    class="inline-flex items-center justify-center h-6 w-6 rounded-md bg-violet-900/60 text-violet-300 font-bold text-xs">✨</span>
+                            </div>
+                            <div class="relative z-10">
+                                <h4 class="text-sm font-semibold text-violet-200">ML-Based Model</h4>
+                                <p class="text-xs text-violet-300/80 mt-1 leading-relaxed">Analyzes a matrix of
+                                    statistical features (frequency, recency rank, timestamps, etc.) passing them
+                                    through a trained model to dynamically predict the optimal eviction target.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Team -->
+                <div class="space-y-4">
+                    <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider">Contributors</h3>
+                    <div class="flex flex-wrap gap-4">
+                        <!-- Contributor 1 -->
+                        <div
+                            class="inline-flex items-center space-x-3 py-2 pl-2 pr-5 rounded-xl bg-slate-900 border border-slate-800 shadow-sm transition-shadow hover:shadow-md hover:border-slate-700">
+                            <div
+                                class="w-10 h-10 rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-white font-bold shadow-inner">
+                                SC
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold text-slate-100">Suryansh Chauhan</p>
+                            </div>
+                        </div>
+                        <!-- Contributor 2 -->
+                        <div
+                            class="inline-flex items-center space-x-3 py-2 pl-2 pr-5 rounded-xl bg-slate-900 border border-slate-800 shadow-sm transition-shadow hover:shadow-md hover:border-slate-700">
+                            <div
+                                class="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white font-bold shadow-inner">
+                                AN
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold text-slate-100">Ashutosh Negi</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resources -->
+                <div class="space-y-4 pt-2 flex flex-col sm:flex-row gap-4">
+                    <button id="view-paper-btn"
+                        class="w-full sm:w-auto flex items-center justify-center space-x-2 px-6 py-3 bg-violet-600 hover:bg-violet-500 text-white rounded-lg font-medium transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow-lg hover:shadow-violet-500/25 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-950 focus:ring-violet-500">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                        </svg>
+                        <span>View Research Paper</span>
+                    </button>
+                    <a href="https://github.com/Surya-nsh5/Intelligent-Cache-Replacement-using-ML" target="_blank" rel="noopener noreferrer"
+                        class="w-full sm:w-auto flex items-center justify-center space-x-2 px-6 py-3 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-700 rounded-lg font-medium transition-all duration-300 hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-950 focus:ring-slate-700">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path fill-rule="evenodd"
+                                d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
+                                clip-rule="evenodd"></path>
+                        </svg>
+                        <span>View Source Code</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Bottom Section: Interactive Simulator -->
+            <div class="w-full">
+                <div
+                    class="bg-slate-900 rounded-2xl shadow-2xl shadow-black/40 border border-slate-800 overflow-hidden flex flex-col">
+
+                    <!-- Top Control Bar -->
+                    <div
+                        class="p-5 sm:p-6 border-b border-slate-800 bg-slate-900/50 flex flex-col sm:flex-row gap-4 items-end justify-between">
+                        <!-- Request Input Group -->
+                        <div class="flex-1 w-full">
+                            <label for="page-request" class="block text-sm font-medium text-slate-400 mb-1">Request
+                                Page</label>
+                            <div class="flex rounded-lg shadow-sm">
+                                <input type="text" id="page-request" placeholder="e.g., A, B, C..."
+                                    class="flex-1 min-w-0 block w-full px-4 py-2.5 rounded-none rounded-l-lg bg-slate-800 text-white placeholder-slate-500 border border-slate-700 focus:ring-violet-500 focus:border-violet-500 sm:text-sm transition-colors outline-none">
+                                <button id="request-btn"
+                                    class="inline-flex items-center px-6 py-2.5 border border-transparent rounded-none rounded-r-lg shadow-sm text-sm font-medium text-white bg-violet-600 hover:bg-violet-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-violet-500 transition-all duration-200 active:scale-95">
+                                    Request
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Size Input -->
+                        <div class="w-full sm:w-24">
+                            <label for="size-input" class="block text-sm font-medium text-slate-400 mb-1">Size</label>
+                            <input type="number" id="size-input" value="4" min="2" max="16"
+                                class="block w-full px-4 py-2.5 text-base border border-slate-700 focus:outline-none focus:ring-violet-500 focus:border-violet-500 sm:text-sm rounded-lg bg-slate-800 text-white shadow-sm transition-colors outline-none">
+                        </div>
+
+                        <!-- Policy Dropdown -->
+                        <div class="w-full sm:w-48 relative z-20">
+                            <label class="block text-sm font-medium text-slate-400 mb-1">Policy</label>
+                            <div class="relative">
+                                <!-- Hidden native select for JS logic compatibility -->
+                                <select id="policy-select" class="hidden">
+                                    <option value="LRU">LRU</option>
+                                    <option value="MRU">MRU</option>
+                                    <option value="ML_SERVER" selected>ML-Based</option>
+                                </select>
+
+                                <!-- Custom Select Button -->
+                                <button type="button" id="custom-select-button"
+                                    class="relative w-full bg-slate-800 border border-slate-700 rounded-lg shadow-sm pl-4 pr-10 py-2.5 text-left cursor-pointer focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent sm:text-sm transition-all duration-200">
+                                    <span class="block truncate text-white" id="custom-select-text">ML-Based</span>
+                                    <span
+                                        class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-400">
+                                        <svg class="h-4 w-4 transition-transform duration-200" id="custom-select-icon"
+                                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 9l-7 7-7-7"></path>
+                                        </svg>
+                                    </span>
+                                </button>
+
+                                <!-- Dropdown Menu -->
+                                <div id="custom-select-menu"
+                                    class="absolute z-30 mt-2 w-full bg-slate-800 shadow-xl shadow-black/50 border border-slate-700 max-h-60 rounded-xl py-1 text-base overflow-auto sm:text-sm transition-all duration-200 opacity-0 invisible transform scale-95 origin-top">
+                                    <ul tabindex="-1" role="listbox">
+                                        <li class="text-slate-300 cursor-pointer select-none relative py-2.5 pl-4 pr-9 hover:bg-slate-700 hover:text-white transition-colors"
+                                            data-value="LRU" role="option">
+                                            <span class="font-normal block truncate">LRU</span>
+                                        </li>
+                                        <li class="text-slate-300 cursor-pointer select-none relative py-2.5 pl-4 pr-9 hover:bg-slate-700 hover:text-white transition-colors"
+                                            data-value="MRU" role="option">
+                                            <span class="font-normal block truncate">MRU</span>
+                                        </li>
+                                        <li class="text-violet-300 cursor-pointer select-none relative py-2.5 pl-4 pr-9 bg-slate-700/50 hover:bg-slate-700 transition-colors"
+                                            data-value="ML_SERVER" role="option">
+                                            <span class="font-semibold block truncate">ML-Based</span>
+                                            <span
+                                                class="check-icon text-violet-400 absolute inset-y-0 right-0 flex items-center pr-4">
+                                                <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd"
+                                                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                                        clip-rule="evenodd"></path>
+                                                </svg>
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-5 sm:p-6 space-y-8">
+
+                        <!-- Cache State Visualization -->
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <h2 class="text-base font-semibold text-white">Cache State</h2>
+                                <span id="cache-size-badge"
+                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-800 text-slate-300 border border-slate-700">
+                                    Size: 4
+                                </span>
+                            </div>
+                            <div id="cache-memory" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 gap-4">
+                                <!-- Slots will be injected here by JS -->
+                            </div>
+                        </div>
+
+                        <!-- Statistics Panel -->
+                        <div class="grid grid-cols-3 gap-3 sm:gap-4">
+                            <div
+                                class="bg-emerald-900/20 rounded-xl p-3 sm:p-4 border border-emerald-900/50 flex flex-col justify-center items-center">
+                                <span
+                                    class="text-emerald-400/80 text-[10px] sm:text-xs font-semibold uppercase tracking-wider mb-1 text-center">Cache
+                                    Hits</span>
+                                <span id="cache-hits"
+                                    class="text-xl sm:text-2xl font-bold text-emerald-400 tabular-nums transition-all duration-300">0</span>
+                            </div>
+                            <div
+                                class="bg-rose-900/20 rounded-xl p-3 sm:p-4 border border-rose-900/50 flex flex-col justify-center items-center">
+                                <span
+                                    class="text-rose-400/80 text-[10px] sm:text-xs font-semibold uppercase tracking-wider mb-1 text-center">Cache
+                                    Misses</span>
+                                <span id="cache-misses"
+                                    class="text-xl sm:text-2xl font-bold text-rose-400 tabular-nums transition-all duration-300">0</span>
+                            </div>
+                            <div
+                                class="bg-violet-900/20 rounded-xl p-3 sm:p-4 border border-violet-900/50 flex flex-col justify-center items-center">
+                                <span
+                                    class="text-violet-400/80 text-[10px] sm:text-xs font-semibold uppercase tracking-wider mb-1 text-center">Hit
+                                    Rate</span>
+                                <span id="hit-rate"
+                                    class="text-xl sm:text-2xl font-bold text-violet-400 tabular-nums transition-all duration-300">0.0%</span>
+                            </div>
+                        </div>
+
+                        <!-- Live Activity Log -->
+                        <div>
+                            <h2 class="text-base font-semibold text-white mb-3">Live Activity Log</h2>
+                            <div id="log-scroll-container"
+                                class="bg-slate-950 rounded-xl p-4 h-64 overflow-y-auto font-mono text-sm shadow-inner border border-slate-800 scrollbar-thin flex flex-col">
+                                <div id="simulation-log" class="flex flex-col gap-2 flex-grow justify-end">
+                                    <div class="text-slate-600 opacity-80 flex items-center space-x-2">
+                                        <span class="w-2 h-2 rounded-full bg-slate-700 animate-pulse"></span>
+                                        <span>Waiting for first request...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Research Paper Modal -->
+    <div id="paper-modal" class="fixed inset-0 z-50 invisible opacity-0 transition-all duration-300 flex items-center justify-center p-4 sm:p-6 lg:p-8">
+        <!-- Backdrop -->
+        <div id="paper-modal-backdrop" class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm cursor-pointer transition-opacity duration-300"></div>
         
-        <h1>Intelligence Cache Replacement Using ML</h1>
-        <div class="controls card">
-            <div class="control-group-main">
-                <label for="page-request">Request Page:</label>
-                <input type="text" id="page-request" placeholder="e.g., A, B, C...">
-                <button id="request-btn">Request</button>
+        <!-- Modal Content -->
+        <div class="relative bg-slate-900 border border-slate-700 shadow-2xl shadow-black/50 rounded-2xl w-full max-w-5xl h-[85vh] flex flex-col transform scale-95 transition-transform duration-300" id="paper-modal-content">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between p-4 px-6 border-b border-slate-800">
+                <h3 class="text-lg font-semibold text-white">Research Paper</h3>
+                <button id="close-paper-btn" class="text-slate-400 hover:text-rose-400 transition-colors p-1.5 rounded-lg hover:bg-slate-800">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
             </div>
             
-            <div class="control-group-policy">
-                <label for="policy-select">Policy:</label>
-                <select id="policy-select" title="Choose cache eviction policy">
-                    <option value="LRU">LRU</option>
-                    <option value="MRU">MRU</option>
-                    <option value="ML_SERVER" selected>ML-Based</option>
-                </select>
-                
-                </div>
-        </div>
-
-        <div class="main-content">
-            <div class="cache-area card">
-                <h2>Cache State (Size: 4)</h2>
-                <div id="cache-memory" class="cache-container">
-                    </div>
-            </div>
-
-            <div class="details-area">
-                <div class="stats-container card">
-                    <h2>Statistics</h2>
-                    <div id="stats">
-                        <p><strong>Cache Hits:</strong> <span id="cache-hits">0</span></p>
-                        <p><strong>Cache Misses:</strong> <span id="cache-misses">0</span></p>
-                        <p><strong>Hit Rate:</strong> <span id="hit-rate">0.0%</span></p>
-                    </div>
-                </div>
-
-                <div class="log-column card">
-                    <h2>Simulation Log</h2>
-                    <div id="simulation-log" class="log-container">
-                        <p class="log-info">Waiting for first request...</p>
-                    </div>
-                </div>
+            <!-- Modal Body (PDF Viewer) -->
+            <div class="flex-1 w-full bg-slate-800 rounded-b-2xl overflow-hidden relative">
+                <iframe src="IntelligentCacheReplacementUsingML.pdf" class="w-full h-full border-0" title="Research Paper"></iframe>
             </div>
         </div>
     </div>
